@@ -6,44 +6,57 @@
 var stringifyJSON = function(obj) {
 	var res = [];
 
-	if input is primitive data type {
-		return input;
+	if (typeof obj === "function" || obj === null){
+		return 'null';
 	}
 
-	if input is function, return null;
+	else if (obj === undefined ){
+		return undefined;
+	}
 
-	if input is array,
+	else if (typeof obj !== "object") {
+		if (typeof obj === "string"){
+			return '"'+obj+'"';
+		}
+		return obj.toString();
+	}
+
+	else if (Array.isArray(obj)){
 
 		res.push('[');
 
-		for (var i=0; i<array.length; i++)
+		for (var i=0; i<obj.length; i++){
 			
-			res.push(recursive(array[i]));
-			if (i<array.length-1){
+			if (typeof obj[i]!=="function" && obj[i]!==undefined){
+				res.push(stringifyJSON(obj[i]));
 				res.push(',');
 			}
-
-		});
-
+		}
+		if (res[res.length-1]===','){
+			res.pop();
+		}
 		res.push(']');
+	}
 
-	if input is non-array obj,
+	else {
 
 		res.push('{');
 		var count = 0;
-		var length = length of obj;
+		var length = Object.keys(obj).length;
 
-		for (var prop in input){
+		for (var prop in obj){
 			count++;
-			res.push(prop+';');
-			res.push(recursive(input[obj]));
-			if (count<length){
-				res.push('');
+			if (typeof obj[prop]!=="function" && obj[prop]!==undefined){
+				res.push('"'+prop+'"'+':');
+				res.push(stringifyJSON(obj[prop]));
+				res.push(',');
 			}
 		}
-
+		if (res[res.length-1]===','){
+			res.pop();
+		}
 		res.push('}');
-
+	}
 
 	return res.join('');
 };
